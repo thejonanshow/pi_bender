@@ -7,8 +7,7 @@ RSpec.describe PiBender::Configuration do
         "drone2"=>{ "ip"=>"2.2.2.2" }
       }}
     }
-    let(:file) { "{}" }
-    let(:config) { PiBender::Configuration.new(file) }
+    let(:config) { PiBender::Configuration.new("{}") }
 
     context "with valid nfs settings" do
       it "doesn't raise an error" do
