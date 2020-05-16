@@ -1,10 +1,26 @@
 module PiBender
   class CLI
-    config = PiBender::Configuration.new("config.yml")
+    def initialize
+      @config = PiBender::Configuration.new("config.yml")
+    end
+
+    def start
+      puts "Welcome to PiBender!"
+      set_passwords
+    end
+
+    def set_passwords
+    end
 
     def prompt
-      # { true || false }
-      # reprompt if validation fails, reprompt with message
+      puts message
+      response = gets.chomp
+
+      if yield(response)
+        return response
+      else
+        prompt(&block)
+      end
     end
   end
 end
