@@ -23,4 +23,12 @@ RSpec.describe PiBender::CLI do
       cli.set_passwords
     end
   end
+
+  context "#create_minions" do
+    it "returns a minion for each hostname in the config" do
+      minions = cli.create_minions
+      hostname_count = test_config.hostnames.length
+      expect(minions.length).to eql(hostname_count)
+    end
+  end
 end
