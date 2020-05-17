@@ -14,6 +14,7 @@ module PiBender
       output "Welcome to PiBender! ~π~"
       output "---"
       set_passwords
+      set_authorized_keys
     end
 
     def create_minions
@@ -40,6 +41,42 @@ module PiBender
           output "Passwords don't match."
           redo
         end
+      end
+    end
+
+    def set_authorized_keys
+      output "2) Pull ssh keys from GitHub\n---"
+      username = prompt(message: "Enter your GitHub username:") do |response|
+        response if username_valid?(response)
+      end
+
+      if keys = fetch_keys(username)
+        set_keys_on_minions(keys)
+      else
+        output "Could not acquire keys, authorized_keys file will not be changed."
+      end
+    end
+
+    def username_valid?(username)
+      url = "https://github.com/#{username}.keys"
+      http_status = @http.head(url).status
+
+      if http_status == 200
+        true
+      else
+        output "Couldn't reach GitHub, the request to #{url} returned '#{http_status}'."
+        false
+      end
+    end
+
+    def fetch_keys(username)
+      url = "https://github.com/#{username}.keys"
+      keys = @http.get(url).body.split("\n")
+    end
+
+    def set_keys_on_minions(keys)
+      @minions.each do |minion|
+        minion.set_keys(keys)
       end
     end
 

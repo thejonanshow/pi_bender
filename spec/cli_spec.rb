@@ -7,7 +7,7 @@ RSpec.describe PiBender::CLI do
     }}
   }
   let(:config) { test_config(parsed_valid.to_yaml) }
-  let(:cli) { PiBender::CLI.new(config).disable_io }
+  let(:cli) { test_cli }
   let(:test_password) { "fake_password" }
 
   context "#prompt" do
@@ -55,6 +55,89 @@ RSpec.describe PiBender::CLI do
       minions = cli.create_minions
       hostname_count = test_config.hostnames.length
       expect(minions.length).to eql(hostname_count)
+    end
+  end
+
+  context "#set_authorized_keys" do
+    it "prompts for a GitHub username" do
+      allow(cli).to receive(:fetch_keys)
+
+      expect(cli).to receive(:prompt).with(message: /GitHub/)
+      cli.set_authorized_keys
+    end
+
+    it "sets the keys on the minions" do
+      allow(cli).to receive(:username_valid?).and_return(true)
+      allow(cli).to receive(:fetch_keys).and_return([])
+
+      expect(cli).to receive(:set_keys_on_minions)
+      cli.set_authorized_keys
+    end
+  end
+
+  context "#set_keys_on_minions" do
+    let(:keys) { ["KEY1", "KEY2"] }
+
+    it "sets the keys on each minion" do
+      allow(cli).to receive(:username_valid?).and_return(true)
+      allow(cli).to receive(:fetch_keys).and_return(keys)
+
+      cli.minions.each do |minion|
+        expect(minion).to receive(:set_keys).with(keys)
+      end
+
+      cli.set_authorized_keys
+    end
+  end
+
+  context "with the HTTP client" do
+    let(:http) { test_http }
+    let(:cli) { test_cli(http: http) }
+    let(:username) { "fake_github_user" }
+
+    context "#username_valid?" do
+      let(:response) { double("HTTPResponse", status: 200) }
+
+      it "makes a head request" do
+        expect(http).to receive(:head).and_return(response)
+        cli.username_valid?(username)
+      end
+
+      it "returns true if the response status is 200" do
+        allow(http).to receive(:head).and_return(response)
+        expect(cli.username_valid?(username)).to be(true)
+      end
+
+      it "returns false if the response status is not 200" do
+        failed_response = double("FailedHTTPResponse", status: 404)
+        allow(http).to receive(:head).and_return(failed_response)
+        expect(cli.username_valid?(username)).to be(false)
+      end
+    end
+
+    context "#fetch_keys" do
+      let(:response) { double("GET Response", body: "") }
+
+      it "makes a get request" do
+        expect(http).to receive(:get).and_return(response)
+        cli.fetch_keys(username)
+      end
+
+      it "returns a single key from the response body" do
+        keys = "ssh-rsa FAKE1\n"
+        response = double("GET Reponse", body: keys)
+        allow(http).to receive(:get).and_return(response)
+
+        expect(cli.fetch_keys(username).length).to eql(1)
+      end
+
+      it "returns multiple keys from the response body" do
+        keys = "ssh-rsa FAKE1\nssh-rsa FAKE2\n"
+        response = double("GET Response", body: keys)
+        allow(http).to receive(:get).and_return(response)
+
+        expect(cli.fetch_keys(username).length).to be > 1
+      end
     end
   end
 end
