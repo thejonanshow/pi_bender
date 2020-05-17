@@ -1,8 +1,9 @@
 module PiBender
   class CLI
-    def initialize(config, test: false)
+    include ::PiBender::ConsoleIO
+
+    def initialize(config)
       @config = config
-      @disable_io = test
     end
 
     def start
@@ -16,16 +17,6 @@ module PiBender
           response.empty?
         end
       end
-    end
-
-    def output(message)
-      return if @disable_io
-      puts message
-    end
-
-    def input
-      return if @disable_io
-      gets.chomp
     end
 
     def prompt(message:, attempts: 0, &response_validator)
