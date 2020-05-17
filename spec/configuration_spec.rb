@@ -1,17 +1,29 @@
 RSpec.describe PiBender::Configuration do
+  let(:parsed_valid) {
+    {"hosts"=>{
+      "primary"=>{ "ip"=>"1.1.1.1", "nfs"=>{ "export"=>"/var/data" } },
+      "drone1"=>{ "ip"=>"2.2.2.2", "nfs"=>{ "mount"=>"/var/data" } },
+      "drone2"=>{ "ip"=>"2.2.2.2" }
+    }}
+  }
+  let(:config) do
+    PiBender::Configuration.new("{}").tap do |c|
+      c.load(parsed_valid.to_yaml)
+    end
+  end
+
+  context "#hostnames" do
+    it "returns a list of the hostnames" do
+      test_hosts = parsed_valid["hosts"].keys
+      expect(config.hostnames).to eql(test_hosts)
+    end
+  end
+
   context "#validate!" do
-    let(:parsed_valid) {
-      {"hosts"=>{
-        "primary"=>{ "ip"=>"1.1.1.1", "nfs"=>{ "export"=>"/var/data" } },
-        "drone1"=>{ "ip"=>"2.2.2.2", "nfs"=>{ "mount"=>"/var/data" } },
-        "drone2"=>{ "ip"=>"2.2.2.2" }
-      }}
-    }
-    let(:config) { PiBender::Configuration.new("{}") }
 
     context "with valid nfs settings" do
       it "doesn't raise an error" do
-        expect { config.load(parsed_valid.to_yaml) }.not_to raise_error
+        expect { config.validate! }.not_to raise_error
       end
     end
 
