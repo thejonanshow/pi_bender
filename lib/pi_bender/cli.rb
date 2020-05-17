@@ -1,7 +1,7 @@
 module PiBender
   class CLI
     def initialize
-      @config = PiBender::Configuration.new("config.yml")
+      @config = PiBender::Configuration.new("pi_bender_config.yml")
     end
 
     def start
