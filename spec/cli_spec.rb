@@ -6,7 +6,7 @@ RSpec.describe PiBender::CLI do
       "drone2"=>{ "ip"=>"2.2.2.2" }
     }}
   }
-  let(:config) { test_config(parsed_valid) }
+  let(:config) { test_config(parsed_valid.to_yaml) }
   let(:cli) { PiBender::CLI.new(config).disable_io }
 
   context "#prompt" do

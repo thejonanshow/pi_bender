@@ -6,7 +6,14 @@ RSpec.describe PiBender::Configuration do
       "drone2"=>{ "ip"=>"2.2.2.2" }
     }}
   }
-  let(:config) { test_config(parsed_valid) }
+  let(:config) { test_config(parsed_valid.to_yaml) }
+
+  context ".new" do
+    it "validates the config" do
+      expect(PiBender::Configuration).to receive(:validate!).once
+      PiBender::Configuration.new("")
+    end
+  end
 
   context "#hostnames" do
     it "returns a list of the hostnames" do
@@ -15,11 +22,22 @@ RSpec.describe PiBender::Configuration do
     end
   end
 
-  context "#validate!" do
+  context "#settings_for_host" do
+    it "returns only the settings for the supplied hostname" do
+      target_hostname = parsed_valid["hosts"].keys.sample
 
+      expect(
+        config.settings_for_hostname(target_hostname)
+      ).to eql(
+        parsed_valid["hosts"][target_hostname]
+      )
+    end
+  end
+
+  context ".validate!" do
     context "with valid nfs settings" do
       it "doesn't raise an error" do
-        expect { config.validate! }.not_to raise_error
+        expect { PiBender::Configuration.validate!(parsed_valid) }.not_to raise_error
       end
     end
 
@@ -36,8 +54,7 @@ RSpec.describe PiBender::Configuration do
         invalid = parsed_valid
         invalid["hosts"]["drone1"] = invalid_drone1_settings
 
-        config.load(invalid.to_yaml)
-        expect { config.validate! }.to raise_error(PiBender::Configuration::NFSError)
+        expect { PiBender::Configuration.validate!(invalid) }.to raise_error(PiBender::Configuration::NFSError)
       end
     end
   end

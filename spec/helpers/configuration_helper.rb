@@ -3,12 +3,10 @@ def config_fixture
 end
 
 def parsed_config_fixture
-  YAML.parse(config_fixture)
+  YAML.load(config_fixture)
 end
 
-def test_config(parsed = nil)
-  parsed ||= config_fixture
-  PiBender::Configuration.new("{}").tap do |c|
-    c.load(parsed.to_yaml)
-  end
+def test_config(file = nil)
+  file ||= config_fixture
+  PiBender::Configuration.new(file)
 end
