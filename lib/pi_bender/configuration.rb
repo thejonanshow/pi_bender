@@ -2,10 +2,13 @@ require "yaml"
 
 module PiBender
   class Configuration
-    attr_reader :parsed
-
     def initialize(file)
       load(file)
+    end
+
+    def hostnames
+      host_settings = @parsed["hosts"]
+      host_settings ? host_settings.keys : []
     end
 
     def load(file)

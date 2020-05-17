@@ -11,6 +11,11 @@ module PiBender
     end
 
     def set_passwords
+      @config.hostnames.each do |host|
+        prompt(message: "Enter password for #{host}:") do |response|
+          response.empty?
+        end
+      end
     end
 
     def output(message)
