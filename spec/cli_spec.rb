@@ -13,6 +13,16 @@ RSpec.describe PiBender::CLI do
     it "raises a PromptError if called without a block" do
       expect { cli.prompt(message: "") }.to raise_error(PiBender::CLI::PromptError)
     end
+
+    context "with invalid input" do
+      it "prompts again" do
+        test_message = "Test prompt"
+        allow(cli).to receive(:input).and_return("", "fake_password")
+
+        expect(cli).to receive(:output).with(test_message).twice
+        cli.prompt(message: "Test prompt") { |response| !response.empty? }
+      end
+    end
   end
 
   context "#set_passwords" do

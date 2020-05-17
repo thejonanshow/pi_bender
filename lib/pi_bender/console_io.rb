@@ -6,7 +6,7 @@ module PiBender
     end
 
     def input
-      return if @disable_io
+      return "" if @io_disabled
       gets.chomp
     end
 

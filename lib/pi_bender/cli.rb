@@ -21,10 +21,10 @@ module PiBender
     def set_passwords
       @minions.each do |minion|
         password = prompt(message: "Enter password for #{minion.hostname}:") do |response|
-          response.empty?
+          !response.empty?
         end
         password_confirmation = prompt(message: "Confirm password for #{minion.hostname}:") do |response|
-          response.empty?
+          !response.empty?
         end
 
         if password == password_confirmation
@@ -42,7 +42,7 @@ module PiBender
       output message
       response = input
 
-      if response_validator
+      if response_validator.call(response)
         return response
       else
         puts "Invalid response."
