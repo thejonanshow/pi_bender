@@ -28,7 +28,7 @@ module PiBender
         end
 
         if password == password_confirmation
-          # minion.set_password(password)
+          minion.set_password(password)
         else
           output "Passwords don't match."
           redo
