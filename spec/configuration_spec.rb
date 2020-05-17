@@ -6,11 +6,7 @@ RSpec.describe PiBender::Configuration do
       "drone2"=>{ "ip"=>"2.2.2.2" }
     }}
   }
-  let(:config) do
-    PiBender::Configuration.new("{}").tap do |c|
-      c.load(parsed_valid.to_yaml)
-    end
-  end
+  let(:config) { test_config(parsed_valid) }
 
   context "#hostnames" do
     it "returns a list of the hostnames" do

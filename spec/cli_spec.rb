@@ -6,7 +6,7 @@ RSpec.describe PiBender::CLI do
       "drone2"=>{ "ip"=>"2.2.2.2" }
     }}
   }
-  let(:config) { PiBender::Configuration.new("{}") }
+  let(:config) { test_config(parsed_valid) }
   let(:cli) { PiBender::CLI.new }
 
   context "#prompt" do
