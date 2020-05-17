@@ -13,15 +13,25 @@ module PiBender
     end
 
     def create_minions
-      @config.hostnames.each do |hostname|
+      @config.hostnames.map do |hostname|
         PiBender::Minion.new(hostname: hostname, settings: @config.settings_for_hostname(hostname))
       end
     end
 
     def set_passwords
-      @config.hostnames.each do |host|
-        prompt(message: "Enter password for #{host}:") do |response|
+      @minions.each do |minion|
+        password = prompt(message: "Enter password for #{minion.hostname}:") do |response|
           response.empty?
+        end
+        password_confirmation = prompt(message: "Confirm password for #{minion.hostname}:") do |response|
+          response.empty?
+        end
+
+        if password == password_confirmation
+          # minion.set_password(password)
+        else
+          output "Passwords don't match."
+          redo
         end
       end
     end
@@ -38,6 +48,8 @@ module PiBender
         puts "Invalid response."
         prompt(message: message, attempts: attempts + 1, &response_validator) unless attempts > 3
       end
+
+      nil
     end
 
     class PromptError < ArgumentError; end

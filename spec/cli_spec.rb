@@ -16,10 +16,12 @@ RSpec.describe PiBender::CLI do
   end
 
   context "#set_passwords" do
-    it "prompts for each host" do
+    it "prompts for password and confirmation for each host" do
       prompt_count = parsed_valid["hosts"].length
 
-      expect(cli).to receive(:prompt).thrice
+      allow(cli).to receive(:prompt).and_return("fake_password")
+
+      expect(cli).to receive(:prompt).exactly(6).times
       cli.set_passwords
     end
   end
