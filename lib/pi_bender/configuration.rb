@@ -6,7 +6,6 @@ module PiBender
 
     def initialize(file)
       load(file)
-      self
     end
 
     def load(file)
