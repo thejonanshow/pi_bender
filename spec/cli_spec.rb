@@ -7,7 +7,7 @@ RSpec.describe PiBender::CLI do
     }}
   }
   let(:config) { test_config(parsed_valid) }
-  let(:cli) { PiBender::CLI.new }
+  let(:cli) { PiBender::CLI.new(config, test: true) }
 
   context "#prompt" do
     it "raises a PromptError if called without a block" do

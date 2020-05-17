@@ -1,7 +1,8 @@
 module PiBender
   class CLI
-    def initialize
-      @config = PiBender::Configuration.new("pi_bender_config.yml")
+    def initialize(config, test: false)
+      @config = config
+      @disable_io = test
     end
 
     def start
@@ -12,16 +13,27 @@ module PiBender
     def set_passwords
     end
 
-    def prompt
+    def output(message)
+      return if @disable_io
+      puts message
+    end
+
+    def input
+      return if @disable_io
+      gets.chomp
+    end
+
+    def prompt(message:, attempts: 0, &response_validator)
       raise PromptError unless block_given?
 
-      puts message
-      response = gets.chomp
+      output message
+      response = input
 
-      if yield(response)
+      if response_validator
         return response
       else
-        prompt(&block)
+        puts "Invalid response."
+        prompt(message: message, attempts: attempts + 1, &response_validator) unless attempts > 3
       end
     end
 
