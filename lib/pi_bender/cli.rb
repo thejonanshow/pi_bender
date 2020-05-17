@@ -13,6 +13,8 @@ module PiBender
     end
 
     def prompt
+      raise PromptError unless block_given?
+
       puts message
       response = gets.chomp
 
@@ -22,5 +24,7 @@ module PiBender
         prompt(&block)
       end
     end
+
+    class PromptError < ArgumentError; end
   end
 end
