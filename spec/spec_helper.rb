@@ -1,6 +1,9 @@
 require "bundler/setup"
 require "pi_bender"
 require "helpers/configuration_helper"
+require "helpers/cli_helper"
+require "helpers/fake_client"
+require "helpers/fake_http"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

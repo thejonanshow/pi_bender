@@ -2,13 +2,17 @@ module PiBender
   class CLI
     include ::PiBender::ConsoleIO
 
-    def initialize(config)
+    attr_reader :minions
+
+    def initialize(config, http: nil)
       @config = config
       @minions = create_minions
+      @http = http || PiBender::Clients::HTTP.new
     end
 
     def start
-      puts "Welcome to PiBender!"
+      output "Welcome to PiBender! ~π~"
+      output "---"
       set_passwords
     end
 
@@ -19,6 +23,7 @@ module PiBender
     end
 
     def set_passwords
+      output "1) Set passwords for the Raspberry Pis\n---"
       @minions.each do |minion|
         message = "Enter password for #{minion.hostname}:"
         password = prompt(message: message, input_handler: method(:input_secure)) do |response|
@@ -47,7 +52,7 @@ module PiBender
       if response_validator.call(response)
         return response
       else
-        puts "Invalid response."
+        output "Invalid response."
         prompt(message: message, attempts: attempts + 1, &response_validator) unless attempts > 3
       end
 

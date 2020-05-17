@@ -19,6 +19,7 @@ RSpec.describe PiBender::CLI do
       it "prompts again" do
         test_message = "Test prompt"
         allow(cli).to receive(:input).and_return("", test_password)
+        allow(cli).to receive(:output).with("Invalid response.").once
 
         expect(cli).to receive(:output).with(test_message).twice
         cli.prompt(message: "Test prompt") { |response| !response.empty? }
