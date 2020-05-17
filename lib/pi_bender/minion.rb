@@ -11,8 +11,8 @@ module PiBender
 
     def set_password(password)
       raise PasswordError.new(
-        "Passwords can not be empty."
-      ) if password.empty?
+        "Passwords can not be nil or empty."
+      ) if password.nil? || password.empty?
 
       @hashed_password = UnixCrypt::SHA256.build(password)
     end
