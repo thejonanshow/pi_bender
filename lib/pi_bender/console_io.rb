@@ -1,3 +1,5 @@
+require "io/console"
+
 module PiBender
   module ConsoleIO
     def output(message)
@@ -8,6 +10,11 @@ module PiBender
     def input
       return "" if @io_disabled
       gets.chomp
+    end
+
+    def input_secure
+      return "" if @io_disabled
+      STDIN.noecho(&:gets).chomp
     end
 
     def disable_io

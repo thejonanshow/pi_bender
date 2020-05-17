@@ -20,10 +20,12 @@ module PiBender
 
     def set_passwords
       @minions.each do |minion|
-        password = prompt(message: "Enter password for #{minion.hostname}:") do |response|
+        message = "Enter password for #{minion.hostname}:"
+        password = prompt(message: message, input_handler: method(:input_secure)) do |response|
           !response.empty?
         end
-        password_confirmation = prompt(message: "Confirm password for #{minion.hostname}:") do |response|
+        message = message.gsub("Enter", "Confirm")
+        password_confirmation = prompt(message: message, input_handler: method(:input_secure)) do |response|
           !response.empty?
         end
 
@@ -36,11 +38,11 @@ module PiBender
       end
     end
 
-    def prompt(message:, attempts: 0, &response_validator)
+    def prompt(message:, attempts: 0, input_handler: method(:input), &response_validator)
       raise PromptError unless block_given?
 
       output message
-      response = input
+      response = input_handler.call
 
       if response_validator.call(response)
         return response
